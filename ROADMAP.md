@@ -11,7 +11,7 @@
 | Popularity | Wikipedia page views | Free, but measures attention, not visitor numbers |
 | Metro and bus | Transitous | Real route in Paris, none in Tunis or Luang Prabang in one test each |
 | Missing transit | Walking or taxi estimate, clearly labelled | Keeps every city usable |
-| Restaurants | Foursquare, if a free key works without a card; otherwise meal breaks with unverified suggestions, clearly labelled | OpenStreetMap is ruled out by the project owner. Gemini Search grounding returned HTTP 429 on the free key. Foursquare is untested |
+| Restaurants | Foursquare, if a free key works without a card; otherwise meal breaks with unverified suggestions, clearly labelled | OpenStreetMap is ruled out by the project owner. Gemini Search grounding returned HTTP 429 on the free key. Foursquare's docs say no card is needed and list 500 free Pro calls, but no live call has been made yet. Screens showing its data must say "Powered by Foursquare" |
 | Budget | Labelled estimates from Gemini | No free source of real prices |
 | Google Maps and Maps grounding | Not used | Maps needs a card; grounding returned HTTP 429 on the free key |
 
@@ -51,7 +51,7 @@ No Postgres, RAG, GraphRAG, login or extra agents. MCP is only added in Phase 7 
 | Phase | Build | Done when |
 |---|---|---|
 | 0. Checks (done) | Test the LLM and data sources | Decisions above are backed by real runs |
-| 1. Tools | Test Foursquare first, then build `verify_place`, `find_restaurants`, `get_route`, `calculate_budget`, `check_plan`, `optimize_schedule` | Each tool has tests and handles missing data |
+| 1. Tools (built; Foursquare live test waiting for a key) | Test Foursquare first, then build `verify_place`, `find_restaurants`, `get_route`, `calculate_budget`, `check_plan`, `optimize_schedule` | Each tool has tests and handles missing data |
 | 2. Agent base and Discovery | One reusable agent loop and the LangGraph skeleton | "Popular museums in Lisbon" returns only verified places |
 | 3. Planner | Day-by-day schedule with transit | A 3-day trip works in Paris and Tunis |
 | 4. Reviewer | Budget and constraint checks, plus the send-back loop | An over-budget plan is revised automatically |
@@ -62,7 +62,7 @@ No Postgres, RAG, GraphRAG, login or extra agents. MCP is only added in Phase 7 
 ## Known risks
 
 - Gemini's free limits can change, and models can be overloaded. The LLM stays behind one small interface so it can be swapped.
-- Wikipedia page views can be misleading. For example, Bardo National Museum showed only 85 views in one month.
+- Wikipedia page views can be misleading. For example, Bardo National Museum showed only 85 views in one month in Phase 0, but 1,685 under its current article title, "Bardo National Museum (Tunis)", in Phase 1. Views must use the real article title.
 - Some verified places have no coordinates on Wikipedia, so `verify_place` should try Wikidata next and must not use an OpenStreetMap service such as Nominatim.
 - Transitous itself uses OpenStreetMap data, so its required credit stays. No part of this project calls OpenStreetMap directly.
 - Ask the Transitous team whether agent requests count as automated use before publishing.
