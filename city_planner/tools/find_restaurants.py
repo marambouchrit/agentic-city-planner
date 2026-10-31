@@ -33,7 +33,7 @@ def _to_place(item: dict) -> Place:
         latitude=latitude,
         longitude=longitude,
         description=", ".join(categories) or None,
-        address=(item.get("location") or {}).get("formatted_address"),
+        address=(item.get("location") or {}).get("formatted_address") or None,
         missing=[] if latitude is not None and longitude is not None else ["coordinates"],
     )
 

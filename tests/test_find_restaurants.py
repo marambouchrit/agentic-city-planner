@@ -81,6 +81,12 @@ def test_missing_coordinates_are_labelled():
     assert search(body={"results": [item]}).restaurants[0].missing == ["coordinates"]
 
 
+def test_empty_address_counts_as_no_address():
+    # Seen in a live test in Luang Prabang.
+    item = {"fsq_place_id": "abc", "name": "X", "location": {"formatted_address": ""}}
+    assert search(body={"results": [item]}).restaurants[0].address is None
+
+
 def test_bad_json_is_unavailable():
     def handler(request):
         return httpx.Response(200, text="not json")
