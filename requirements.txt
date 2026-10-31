@@ -1,4 +1,5 @@
 httpx==0.28.1
+langgraph==1.2.19
 ortools==9.15.6755
 pydantic==2.14.2
 python-dotenv==1.0.1

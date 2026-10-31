@@ -52,7 +52,7 @@ No Postgres, RAG, GraphRAG, login or extra agents. MCP is only added in Phase 7 
 |---|---|---|
 | 0. Checks (done) | Test the LLM and data sources | Decisions above are backed by real runs |
 | 1. Tools (done) | Test Foursquare first, then build `verify_place`, `find_restaurants`, `get_route`, `calculate_budget`, `check_plan`, `optimize_schedule` | Each tool has tests and handles missing data |
-| 2. Agent base and Discovery | One reusable agent loop and the LangGraph skeleton | "Popular museums in Lisbon" returns only verified places |
+| 2. Agent base and Discovery (done) | One reusable agent loop and the LangGraph skeleton | "Popular museums in Lisbon" returns only verified places |
 | 3. Planner | Day-by-day schedule with transit | A 3-day trip works in Paris and Tunis |
 | 4. Reviewer | Budget and constraint checks, plus the send-back loop | An over-budget plan is revised automatically |
 | 5. Orchestrator and API | Full graph, trip changes and FastAPI | One request produces a full itinerary end to end |
@@ -66,4 +66,6 @@ No Postgres, RAG, GraphRAG, login or extra agents. MCP is only added in Phase 7 
 - Some verified places have no coordinates on Wikipedia, so `verify_place` should try Wikidata next and must not use an OpenStreetMap service such as Nominatim.
 - Transitous itself uses OpenStreetMap data, so its required credit stays. No part of this project calls OpenStreetMap directly.
 - Ask the Transitous team whether agent requests count as automated use before publishing.
-- Each trip's real LLM call count is still unmeasured, so the number of trips per day is unknown.
+- Each trip's real LLM call count is still unmeasured, so the number of trips per day is unknown. Discovery alone used 2 to 5 calls in live runs.
+- Code can check that a place is real, but not every word of an agent's reason. Reasons are labelled as opinion.
+- Real places with no matching English Wikipedia article are rejected, such as MAAT in Lisbon, so small cities can get few results.

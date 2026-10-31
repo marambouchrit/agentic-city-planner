@@ -3,7 +3,16 @@
 A multi-agent trip planner for any city, with popular places, metro stops and budget estimates.
 Four agents: Orchestrator, Discovery, Planner and Reviewer.
 
-See [ROADMAP.md](ROADMAP.md) for decisions, rules and phases. Phases 0 and 1 are built. The agents start in Phase 2.
+See [ROADMAP.md](ROADMAP.md) for decisions, rules and phases. Phases 0 to 2 are built: the tools, the agent loop,
+the Discovery agent and the LangGraph skeleton. The Planner, Reviewer and Orchestrator agents come next.
+
+## Try the Discovery agent
+
+```bash
+python -m city_planner.run "Popular museums in Lisbon"
+```
+
+This uses your Gemini quota, and it prints every decision the agent made. Reasons are the agent's opinion, not verified data.
 
 ## Run the tests and checks
 
