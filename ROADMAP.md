@@ -56,7 +56,7 @@ No Postgres, RAG, GraphRAG, login or extra agents. MCP is only added in Phase 7 
 | 3. Planner (done) | Day-by-day schedule with transit | A 3-day trip works in Paris and Tunis |
 | 4. Reviewer (done) | Budget and constraint checks, plus the send-back loop | An over-budget plan is revised automatically |
 | 5. Orchestrator and API (done) | Full graph, trip changes and FastAPI | One request produces a full itinerary end to end |
-| 6. Frontend | Next.js chat and itinerary view, reusing the old UI | A trip can be planned and changed in the browser |
+| 6. Frontend (built, final live check pending) | Next.js chat and itinerary view, with the old UI used only as a starting point after reading it | A trip can be planned and changed in the browser |
 | 7. Finish | Evaluation on 10 cities, README with results, demo video, optional MCP | Measured results are ready for the CV |
 
 ## Known risks

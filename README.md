@@ -4,7 +4,7 @@ A multi-agent trip planner for any city, with popular places, metro stops and bu
 Four agents: Orchestrator, Discovery, Planner and Reviewer.
 
 See [ROADMAP.md](ROADMAP.md) for decisions, rules and phases, and [SPEC.md](SPEC.md) for the detailed plan.
-Phases 0 to 5 are built: the tools, the agent loop, all four agents and the API. The frontend comes next.
+Phases 0 to 6 are built: the tools, the agent loop, all four agents, the API and the website.
 
 ## Plan a trip
 
@@ -36,6 +36,25 @@ uvicorn city_planner.api:app --port 8000
 | `GET /health` | Status check |
 
 Trips are kept in memory, so a restart loses them. The API allows 20 planning requests a day, and only `FRONTEND_ORIGIN` can call it from a browser.
+
+## Run the website
+
+```bash
+cd frontend
+npm install
+copy .env.example .env.local
+npm run dev
+```
+
+Start the API first, then open http://localhost:3000.
+
+Browser tests use the real API code with a scripted LLM, so they use no network or quota. They run on desktop and on an emulated phone:
+
+```bash
+cd frontend
+npx playwright install chromium
+npm test
+```
 
 ## Run the tests and checks
 

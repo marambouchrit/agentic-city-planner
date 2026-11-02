@@ -5,3 +5,10 @@ __pycache__/
 .env
 spikes/results/
 .cache/
+node_modules/
+.next/
+test-results/
+playwright-report/
+*.tsbuildinfo
+frontend/next-env.d.ts
+.env.local
