@@ -196,8 +196,9 @@ The solver has a time limit: 20 seconds per round for up to 3 days and 60 second
 - **Send-back limit:** at most 2. The third result is returned as it is, with its remaining problems listed, and is never presented as passing.
 - **Best plan:** keep the best plan so far. A revision that gets worse does not replace it.
 - **Over-budget changes:** the Planner gets the items and the amount to cut. Expensive places can be dropped or swapped through `excluded`.
+- **Fixed prices:** once an item has a price, it stays fixed for the trip, so a plan can't pass on a lower guess. All meal breaks share one price.
 
-**LLM call budget:** the current limits do not fit together. Discovery 8, Planner 5, Reviewer 3 and a 2-call Orchestrator make 18 for one pass. Each send-back to the Planner adds up to 8, for 34 in total against a limit of 30. The trip limit stays at 30. When too few calls are left for another round, the Reviewer's result is final, and the plan is returned with its issues. Tested offline.
+**LLM call budget:** the current limits do not fit together. Discovery 8, Planner 5, Reviewer 4 and a 2-call Orchestrator make 19 for one pass. Each send-back to the Planner adds up to 9, for 37 in total against a limit of 30. The Reviewer has 4 steps because 3 left no room to correct a refused approval in a live run. In 4 live Paris runs with 2 revisions each, a trip really used 15 to 19 calls, with no Orchestrator yet. The trip limit stays at 30. When too few calls are left for another round, the Reviewer's result is final, and the plan is returned with its issues. Tested offline.
 
 **Done when:**
 

@@ -20,7 +20,8 @@ def main() -> None:
     parser.add_argument("--days", type=int, default=3)
     parser.add_argument("--date", type=date.fromisoformat, help="First day of the trip, as 2026-12-07")
     parser.add_argument("--pace", type=int, help="At most this many attractions a day")
-    parser.add_argument("--budget", type=float)
+    parser.add_argument("--budget", type=float, help="For one traveler")
+    parser.add_argument("--currency", default="EUR")
     parser.add_argument("--preferences", default="")
     args = parser.parse_args()
     trip = TripRequest(
@@ -29,6 +30,7 @@ def main() -> None:
         start_date=args.date,
         max_activities_per_day=args.pace,
         budget=args.budget,
+        currency=args.currency,
         preferences=args.preferences,
     )
     try:
@@ -61,7 +63,7 @@ def main() -> None:
     print(f"Rejected by tools: {discovery.rejected}")
     print(f"Could not be checked: {discovery.unavailable}")
 
-    planner = state.get("planner")
+    planner = state.get("final_plan") or state.get("planner")
     if planner is None:
         print("\nNo schedule was produced.")
         return
@@ -77,6 +79,24 @@ def main() -> None:
     for note in planner.schedule.notes:
         print(f"Note: {note}")
     print(f"\nAgent's opinion, not verified data: {planner.explanation}")
+
+    review = state.get("final_review")
+    print(f"\nRevisions: {state.get('send_backs', 0)}")
+    if review is None:
+        print("This plan was not reviewed.")
+        return
+    print("Reviewer: approved" if review.verdict == "approve" else f"Reviewer: NOT approved ({review.issue_code}). {review.instructions}")
+    for note in state.get("notes", []):
+        print(f"Note: {note}")
+    print(f"Estimated cost for one traveler: {review.budget.total} {review.budget.currency}. {review.budget.note}")
+    if review.budget.budget is not None:
+        print(f"Budget: {review.budget.budget}. Over budget: {review.budget.over_budget}")
+    for item in review.costs:
+        print(f"  {item.name}: {'unknown' if item.amount is None else item.amount} (estimate)")
+    for issue in review.check.issues:
+        if issue.severity == "error":
+            print(f"Rule error: {issue.message}")
+    print(f"Agent's opinion, not verified data: {review.summary}")
 
 
 if __name__ == "__main__":

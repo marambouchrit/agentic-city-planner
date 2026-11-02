@@ -162,6 +162,7 @@ class TripRequest(BaseModel):
     days: int = Field(ge=1)
     start_date: date | None = None
     budget: float | None = Field(default=None, ge=0)
+    currency: str = "EUR"
     # None lets the Planner choose the pace.
     max_activities_per_day: int | None = Field(default=None, ge=1)
     max_walk_minutes: int = Field(default=20, ge=1)

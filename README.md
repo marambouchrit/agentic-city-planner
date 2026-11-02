@@ -4,17 +4,20 @@ A multi-agent trip planner for any city, with popular places, metro stops and bu
 Four agents: Orchestrator, Discovery, Planner and Reviewer.
 
 See [ROADMAP.md](ROADMAP.md) for decisions, rules and phases, and [SPEC.md](SPEC.md) for the detailed plan.
-Phases 0 to 3 are built: the tools, the agent loop, and the Discovery and Planner agents. The Reviewer and Orchestrator come next.
+Phases 0 to 4 are built: the tools, the agent loop, and the Discovery, Planner and Reviewer agents. The Orchestrator comes next.
 
 ## Plan a trip
 
 ```bash
 python -m city_planner.run Paris --days 3
+python -m city_planner.run Paris --days 3 --budget 300
 python -m city_planner.run Tunis --days 3 --date 2026-12-07 --pace 3 --preferences "history, local food"
 ```
 
 This uses your Gemini, Foursquare and Transitous quotas, and it prints every decision the agents made.
-A 3-day trip used 5 to 6 LLM calls and 17 to 28 Transitous requests in live runs. Reasons are the agents' opinion, not verified data.
+A 3-day Paris trip revised twice for its budget used 15 to 19 LLM calls and 47 to 77 Transitous requests in live runs. Reasons are the agents' opinion, not verified data.
+
+The Reviewer sends a plan back at most 2 times. Prices are estimates for one traveler, and a plan that still has problems is shown as not approved.
 
 Public transport comes first. A walk of up to 20 minutes is offered as a choice, and a taxi only appears as a labelled backup
 when there is neither. Opening hours are not checked, and visit lengths are estimates.

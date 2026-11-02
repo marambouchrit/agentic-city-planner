@@ -54,7 +54,7 @@ No Postgres, RAG, GraphRAG, login or extra agents. MCP is only added in Phase 7 
 | 1. Tools (done) | Test Foursquare first, then build `verify_place`, `find_restaurants`, `get_route`, `calculate_budget`, `check_plan`, `optimize_schedule` | Each tool has tests and handles missing data |
 | 2. Agent base and Discovery (done) | One reusable agent loop and the LangGraph skeleton | "Popular museums in Lisbon" returns only verified places |
 | 3. Planner (done) | Day-by-day schedule with transit | A 3-day trip works in Paris and Tunis |
-| 4. Reviewer | Budget and constraint checks, plus the send-back loop | An over-budget plan is revised automatically |
+| 4. Reviewer (done) | Budget and constraint checks, plus the send-back loop | An over-budget plan is revised automatically |
 | 5. Orchestrator and API | Full graph, trip changes and FastAPI | One request produces a full itinerary end to end |
 | 6. Frontend | Next.js chat and itinerary view, reusing the old UI | A trip can be planned and changed in the browser |
 | 7. Finish | Evaluation on 10 cities, README with results, demo video, optional MCP | Measured results are ready for the CV |
@@ -66,7 +66,7 @@ No Postgres, RAG, GraphRAG, login or extra agents. MCP is only added in Phase 7 
 - Some verified places have no coordinates on Wikipedia, so `verify_place` should try Wikidata next and must not use an OpenStreetMap service such as Nominatim.
 - Transitous itself uses OpenStreetMap data, so its required credit stays. No part of this project calls OpenStreetMap directly.
 - Ask the Transitous team whether agent requests count as automated use before publishing.
-- Discovery and the Planner used 5 to 6 LLM calls and 17 to 28 Transitous requests per 3-day trip in 4 live runs. The Reviewer's cost is still unmeasured.
+- A 3-day trip revised twice for its budget used 15 to 19 LLM calls and 47 to 77 Transitous requests in 4 live Paris runs, so only about 9 to 14 such trips fit the daily limit. A plan needing no revision used 17 to 28 requests before the Reviewer existed. Gemini's daily limit for a full trip is still unmeasured.
 - A verified name can match a related article, such as "Luxembourg Garden" matching Luxembourg Palace.
 - Code can check that a place is real, but not every word of an agent's reason. Reasons are labelled as opinion.
 - Real places with no matching English Wikipedia article are rejected, such as MAAT in Lisbon, so small cities can get few results.

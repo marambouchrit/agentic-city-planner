@@ -214,18 +214,21 @@ def discovery_script(restaurant_ids=("foursquare:0", "foursquare:1")):
     ]
 
 
+REVIEW = [[call("calculate_budget", prices=[])], [call("finish", verdict="approve", summary="Fine.")]]
+
+
 def test_graph_runs_discovery_then_planner_and_shares_the_call_budget(monkeypatch):
     graph_setup(monkeypatch)
-    state = plan_trip(TRIP, FakeLLM(discovery_script() + [[optimize_call()], [finish()]]))
+    state = plan_trip(TRIP, FakeLLM(discovery_script() + [[optimize_call()], [finish()]] + REVIEW))
     assert state["error"] is None
     assert state["planner"].schedule.status == "ok"
-    assert state["llm_calls"] == 5
-    assert {e.agent for e in state["trace"]} == {"Discovery", "Planner"}
+    assert state["llm_calls"] == 7
+    assert {e.agent for e in state["trace"]} == {"Discovery", "Planner", "Reviewer"}
 
 
 def test_every_stop_traces_to_a_tool_result(monkeypatch):
     graph_setup(monkeypatch)
-    state = plan_trip(TRIP, FakeLLM(discovery_script() + [[optimize_call()], [finish()]]))
+    state = plan_trip(TRIP, FakeLLM(discovery_script() + [[optimize_call()], [finish()]] + REVIEW))
     known = {c.place.place_id for c in state["discovery"].attractions + state["discovery"].restaurants}
     assert all(s.place_id in known for d in state["planner"].schedule.days for s in d.stops if s.place_id)
 

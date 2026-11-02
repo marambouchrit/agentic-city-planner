@@ -26,6 +26,7 @@ You decide the traveler's priorities, the pace, how long each visit needs, and w
 - The default visit is 90 minutes. Always give visit_minutes for large museums, palaces and big sites, which need longer, and for small places such as a gate or a square, which need less.
 - Read the result. Try once more only if your choices clearly caused a problem, such as too few places on a day. Each try is slow.
 - Use get_route only to check one specific hop you have a question about. The schedule already has its routes.
+- If the Reviewer sent a plan back, make the change it asks for. To cut costs, use excluded to leave out the most expensive places it lists. A meal break still means buying a meal, so only leave out a restaurant that costs clearly more than an ordinary meal. Keep free places. Cut only as much as the amount over budget needs.
 - Only use place IDs from the list you are given. Never invent a place, a time or a route.
 - When you are done, call finish with the schedule_id you choose and a short explanation of your choices.
 - The explanation must only use the traveler's request and the tool results. Do not add facts from your memory, such as opening hours or prices."""
@@ -65,6 +66,7 @@ class PlannerOutput(BaseModel):
     schedule: ScheduleResult  # written by code, exactly as the tool produced it
     explanation: str  # the LLM's opinion
     schedule_id: str
+    choices: str  # the choices that produced this schedule, for a later revision
 
 
 def _travel_summary(hop: Hop | None) -> str | None:
@@ -99,7 +101,7 @@ def _summary(schedule_id: str, schedule: ScheduleResult) -> dict:
     }
 
 
-def planner_task(trip: TripRequest, discovery: DiscoveryOutput) -> str:
+def planner_task(trip: TripRequest, discovery: DiscoveryOutput, feedback: str = "") -> str:
     def line(chosen) -> str:
         views = f", {chosen.place.page_views} page views" if chosen.place.page_views is not None else ""
         return f"- {chosen.place.place_id}: {chosen.place.name}{views}. Chosen because: {chosen.reason}"
@@ -114,6 +116,8 @@ def planner_task(trip: TripRequest, discovery: DiscoveryOutput) -> str:
     ]
     if trip.max_activities_per_day:
         parts.insert(2, f"The traveler asked for at most {trip.max_activities_per_day} attractions a day.")
+    if feedback:
+        parts.append(feedback)
     return "\n".join(parts)
 
 
@@ -126,6 +130,7 @@ def build_planner_agent(
     """Each trip gets a new agent, with its own record of the schedules the tool really produced."""
     places: dict[str, Place] = {c.place.place_id: c.place for c in discovery.attractions + discovery.restaurants}
     schedules: dict[str, ScheduleResult] = {}
+    choices: dict[str, str] = {}
     route_calls = {"count": 0}
 
     def check_ids(place_ids: list[str]) -> None:
@@ -152,6 +157,7 @@ def build_planner_agent(
         )
         schedule_id = f"schedule_{len(schedules) + 1}"
         schedules[schedule_id] = schedule
+        choices[schedule_id] = args.model_dump_json()
         return _summary(schedule_id, schedule)
 
     def run_route(args: RouteArgs) -> dict:
@@ -169,7 +175,7 @@ def build_planner_agent(
             raise ValueError(f"{answer.schedule_id} was not returned by optimize_schedule.")
         if schedule.status == "failed":
             raise ValueError(f"{answer.schedule_id} failed, so it can't be the final schedule.")
-        return PlannerOutput(schedule=schedule, explanation=answer.explanation, schedule_id=answer.schedule_id)
+        return PlannerOutput(schedule=schedule, explanation=answer.explanation, schedule_id=answer.schedule_id, choices=choices[answer.schedule_id])
 
     return AgentConfig(
         name="Planner",
