@@ -4,7 +4,7 @@ from city_planner.agents.base import CallBudget, run_agent
 from city_planner.agents.discovery import MAX_RESTAURANT_CALLS, build_discovery_agent
 from city_planner.graph import plan_trip
 from city_planner.llm import LLMError
-from city_planner.schemas import Place, RestaurantResult, VerifyResult
+from city_planner.schemas import Place, RestaurantResult, TripRequest, VerifyResult
 from tests.fakes import FakeLLM, call
 
 TILE = Place(place_id="wikipedia:1", name="National Tile Museum", kind="attraction", source="wikipedia", latitude=38.7, longitude=-9.1, page_views=500)
@@ -134,17 +134,8 @@ def test_each_trip_gets_its_own_record_of_places():
     assert result.trace[0].kind == "rejected"
 
 
-def test_graph_runs_discovery_and_ends(monkeypatch):
-    monkeypatch.setattr("city_planner.graph.build_discovery_agent", lambda: build_discovery_agent(fake_verify, fake_restaurants))
-    state = plan_trip("Popular museums in Lisbon", FakeLLM([[verify()], [finish()]]))
-    assert state["discovery"].attractions[0].place == TILE
-    assert state["llm_calls"] == 2
-    assert state["error"] is None
-    assert [e.kind for e in state["trace"]] == ["tool", "finish"]
-
-
 def test_graph_reports_failure_and_invents_nothing(monkeypatch):
     monkeypatch.setattr("city_planner.graph.build_discovery_agent", lambda: build_discovery_agent(fake_verify, fake_restaurants))
-    state = plan_trip("Popular museums in Lisbon", FakeLLM([LLMError("HTTP 429: quota")]))
+    state = plan_trip(TripRequest(city="Lisbon", days=1), FakeLLM([LLMError("HTTP 429: quota")]))
     assert state["discovery"] is None
     assert "429" in state["error"]

@@ -4,3 +4,5 @@ ortools==9.15.6755
 pydantic==2.14.2
 python-dotenv==1.0.1
 pytest==8.3.4
+timezonefinder==9.2.0
+tzdata==2026.6

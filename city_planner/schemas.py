@@ -1,11 +1,10 @@
 """Data types shared by the tools."""
 
+from datetime import date
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field, model_validator
 
-# Modes ending in "_estimate" are calculated from straight-line distance, not from a real route.
-TravelMode = Literal["transit", "walk", "walk_estimate", "taxi_estimate"]
 ToolStatus = Literal["ok", "no_results", "unavailable"]
 
 MEAL_BREAK_NAME = "Meal break (no verified restaurant)"
@@ -48,15 +47,48 @@ class TransitLine(BaseModel):
     to_stop: str | None
 
 
-class Route(BaseModel):
-    mode: TravelMode | None
-    minutes: float | None
-    source: Literal["transitous", "estimate", "none"]
-    transfers: int | None = None
-    lines: list[TransitLine] = Field(default_factory=list)
+class PublicTransportOption(BaseModel):
+    minutes: float
+    transfers: int
+    lines: list[TransitLine]
+    # Walking to, between and from the stops.
+    walking_minutes_inside: float | None = None
+
+
+class WalkOption(BaseModel):
+    minutes: float
+    is_estimate: bool
+
+
+class TaxiBackup(BaseModel):
+    minutes: float  # always an estimate
+    reason: str
+
+
+class Hop(BaseModel):
+    """How to get from one place to the next, following the transport rules in SPEC.md section 1."""
+
+    public_transport: PublicTransportOption | None = None
+    walk: WalkOption | None = None
+    # Only when there is neither public transport nor a walk to offer.
+    taxi_backup: TaxiBackup | None = None
+    # True when the service failed, which is different from finding no route.
+    check_failed: bool = False
     distance_km: float | None = None
-    walking_estimate_minutes: float | None = None
     note: str | None = None
+
+    @model_validator(mode="after")
+    def _taxi_is_only_a_backup(self) -> "Hop":
+        if self.taxi_backup and (self.public_transport or self.walk):
+            raise ValueError("A taxi can only be offered when there is no public transport and no walk.")
+        return self
+
+    @computed_field
+    @property
+    def reserved_minutes(self) -> float | None:
+        """The time the schedule must allow: the longer option, so either choice arrives on time."""
+        options = [option.minutes for option in (self.public_transport, self.walk, self.taxi_backup) if option]
+        return max(options) if options else None
 
 
 class CostItem(BaseModel):
@@ -88,14 +120,21 @@ class Stop(BaseModel):
     duration_is_estimate: bool = True
     latitude: float | None = None
     longitude: float | None = None
-    # Both None for the first stop of a day.
-    travel_minutes: float | None = None
-    travel_mode: TravelMode | None = None
+    # None for the first stop of a day, unless the day has a start point.
+    hop: Hop | None = None
 
 
 class Day(BaseModel):
     day_number: int
     stops: list[Stop]
+
+
+class LockedStop(BaseModel):
+    """A stop the traveler kept, which must stay on this day at this time."""
+
+    place_id: str
+    day_number: int = Field(ge=1)
+    start: str = Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
 
 
 class ScheduleResult(BaseModel):
@@ -114,3 +153,16 @@ class PlanIssue(BaseModel):
 class PlanCheck(BaseModel):
     passed: bool  # True when there are no errors; warnings are allowed
     issues: list[PlanIssue]
+
+
+class TripRequest(BaseModel):
+    """What the traveler asked for. The command line fills it until the Orchestrator does in Phase 5."""
+
+    city: str
+    days: int = Field(ge=1)
+    start_date: date | None = None
+    budget: float | None = Field(default=None, ge=0)
+    # None lets the Planner choose the pace.
+    max_activities_per_day: int | None = Field(default=None, ge=1)
+    max_walk_minutes: int = Field(default=20, ge=1)
+    preferences: str = ""

@@ -1,0 +1,217 @@
+{
+ "itineraries": [
+  {
+   "duration": 1620,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "BUS",
+     "displayName": "72",
+     "routeShortName": "72",
+     "duration": 840,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Pont d'Iena / Varsovie"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 540,
+     "from": {
+      "name": "Pont d'Iena / Varsovie"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 1740,
+   "transfers": 1,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 300,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 360,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Franklin D. Roosevelt"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "Franklin D. Roosevelt"
+     },
+     "to": {
+      "name": "Franklin D. Roosevelt"
+     }
+    },
+    {
+     "mode": "BUS",
+     "displayName": "42",
+     "routeShortName": "42",
+     "duration": 480,
+     "from": {
+      "name": "Franklin D. Roosevelt"
+     },
+     "to": {
+      "name": "Tour Eiffel"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 300,
+     "from": {
+      "name": "Tour Eiffel"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 1560,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "BUS",
+     "displayName": "72",
+     "routeShortName": "72",
+     "duration": 780,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Pont d'Iena / Varsovie"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 540,
+     "from": {
+      "name": "Pont d'Iena / Varsovie"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 1560,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "BUS",
+     "displayName": "72",
+     "routeShortName": "72",
+     "duration": 780,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Pont d'Iena / Varsovie"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 540,
+     "from": {
+      "name": "Pont d'Iena / Varsovie"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 1560,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "BUS",
+     "displayName": "72",
+     "routeShortName": "72",
+     "duration": 780,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Pont d'Iena / Varsovie"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 540,
+     "from": {
+      "name": "Pont d'Iena / Varsovie"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  }
+ ],
+ "direct": []
+}

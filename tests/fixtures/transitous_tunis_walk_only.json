@@ -1,0 +1,21 @@
+{
+ "itineraries": [],
+ "direct": [
+  {
+   "duration": 731,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 731,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  }
+ ]
+}

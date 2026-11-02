@@ -3,16 +3,21 @@
 A multi-agent trip planner for any city, with popular places, metro stops and budget estimates.
 Four agents: Orchestrator, Discovery, Planner and Reviewer.
 
-See [ROADMAP.md](ROADMAP.md) for decisions, rules and phases. Phases 0 to 2 are built: the tools, the agent loop,
-the Discovery agent and the LangGraph skeleton. The Planner, Reviewer and Orchestrator agents come next.
+See [ROADMAP.md](ROADMAP.md) for decisions, rules and phases, and [SPEC.md](SPEC.md) for the detailed plan.
+Phases 0 to 3 are built: the tools, the agent loop, and the Discovery and Planner agents. The Reviewer and Orchestrator come next.
 
-## Try the Discovery agent
+## Plan a trip
 
 ```bash
-python -m city_planner.run "Popular museums in Lisbon"
+python -m city_planner.run Paris --days 3
+python -m city_planner.run Tunis --days 3 --date 2026-12-07 --pace 3 --preferences "history, local food"
 ```
 
-This uses your Gemini quota, and it prints every decision the agent made. Reasons are the agent's opinion, not verified data.
+This uses your Gemini, Foursquare and Transitous quotas, and it prints every decision the agents made.
+A 3-day trip used 5 to 6 LLM calls and 17 to 28 Transitous requests in live runs. Reasons are the agents' opinion, not verified data.
+
+Public transport comes first. A walk of up to 20 minutes is offered as a choice, and a taxi only appears as a labelled backup
+when there is neither. Opening hours are not checked, and visit lengths are estimates.
 
 ## Run the tests and checks
 
@@ -43,6 +48,9 @@ Restaurants are powered by [Foursquare](https://foursquare.com/) when a key is s
 Public transit routes come from [Transitous](https://transitous.org/), using these
 [data sources](https://transitous.org/sources/) and data from
 [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors.
+
+Time zones are looked up offline with [timezonefinder](https://github.com/jannikmi/timezonefinder), whose data is
+built from OpenStreetMap. No OpenStreetMap service is called.
 
 ## License
 

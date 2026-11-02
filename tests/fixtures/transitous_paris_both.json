@@ -1,0 +1,364 @@
+{
+ "itineraries": [
+  {
+   "duration": 420,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 60,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Châtelet"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 120,
+     "from": {
+      "name": "Châtelet"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 420,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 60,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Châtelet"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 120,
+     "from": {
+      "name": "Châtelet"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 420,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 60,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Châtelet"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 120,
+     "from": {
+      "name": "Châtelet"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 420,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 60,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Châtelet"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 120,
+     "from": {
+      "name": "Châtelet"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 420,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 60,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Châtelet"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 120,
+     "from": {
+      "name": "Châtelet"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 420,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 60,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Châtelet"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 120,
+     "from": {
+      "name": "Châtelet"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 420,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 60,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Châtelet"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 120,
+     "from": {
+      "name": "Châtelet"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 420,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 60,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Châtelet"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 120,
+     "from": {
+      "name": "Châtelet"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 420,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 60,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Châtelet"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 120,
+     "from": {
+      "name": "Châtelet"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  }
+ ],
+ "direct": [
+  {
+   "duration": 760,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 760,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  }
+ ]
+}

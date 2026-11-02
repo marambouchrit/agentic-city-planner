@@ -1,6 +1,6 @@
 """Tests of check_plan. No network is used."""
 
-from city_planner.schemas import MEAL_BREAK_NAME, Day, Place, Stop
+from city_planner.schemas import MEAL_BREAK_NAME, Day, Hop, Place, PublicTransportOption, Stop, TaxiBackup, WalkOption
 from city_planner.tools.check_plan import check_plan
 
 MUSEUM = Place(place_id="wikipedia:1", name="Louvre", kind="attraction", source="wikipedia", latitude=48.86, longitude=2.33)
@@ -23,7 +23,8 @@ def stop(place=MUSEUM, start="09:00", slot="activity", **overrides):
 
 
 def later(place=TOWER, start="11:00", **overrides):
-    return stop(place, start, travel_minutes=20, travel_mode="transit", **overrides)
+    bus = PublicTransportOption(minutes=20, transfers=0, lines=[])
+    return stop(place, start, hop=Hop(public_transport=bus), **overrides)
 
 
 def check(*stops, expected_days=1, **kwargs):
@@ -98,13 +99,14 @@ def test_stop_ending_after_midnight_is_rejected():
 
 
 def test_long_walk_is_rejected_only_with_a_limit():
-    walk = stop(TOWER, "11:00", travel_minutes=45, travel_mode="walk_estimate")
+    walk = stop(TOWER, "11:00", hop=Hop(walk=WalkOption(minutes=45, is_estimate=True)))
     assert "walk_too_long" in codes(check(stop(), walk, max_walking_minutes=30))
     assert "walk_too_long" not in codes(check(stop(), walk))
 
 
 def test_estimates_and_missing_travel_are_warnings():
-    estimated = check(stop(), stop(TOWER, "11:00", travel_minutes=10, travel_mode="taxi_estimate"))
+    taxi = Hop(taxi_backup=TaxiBackup(minutes=10, reason="No public transport route in our data."))
+    estimated = check(stop(), stop(TOWER, "11:00", hop=taxi))
     assert estimated.passed and "estimated_travel" in codes(estimated)
     unknown = check(stop(), stop(TOWER, "11:00"))
     assert unknown.passed and "missing_travel" in codes(unknown)

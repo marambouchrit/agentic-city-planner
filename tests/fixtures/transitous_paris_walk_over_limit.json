@@ -1,0 +1,402 @@
+{
+ "itineraries": [
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 120,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Hôtel de Ville"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 600,
+     "from": {
+      "name": "Hôtel de Ville"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Pont des Arts"
+     }
+    },
+    {
+     "mode": "BUS",
+     "displayName": "27",
+     "routeShortName": "27",
+     "duration": 240,
+     "from": {
+      "name": "Pont des Arts"
+     },
+     "to": {
+      "name": "Saint-Michel Notre-Dame"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 480,
+     "from": {
+      "name": "Saint-Michel Notre-Dame"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 120,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Hôtel de Ville"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 600,
+     "from": {
+      "name": "Hôtel de Ville"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 120,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Hôtel de Ville"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 600,
+     "from": {
+      "name": "Hôtel de Ville"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "BUS",
+     "displayName": "67",
+     "routeShortName": "67",
+     "duration": 300,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Hôtel de Ville"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 420,
+     "from": {
+      "name": "Hôtel de Ville"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 120,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Hôtel de Ville"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 600,
+     "from": {
+      "name": "Hôtel de Ville"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Pont des Arts"
+     }
+    },
+    {
+     "mode": "BUS",
+     "displayName": "27",
+     "routeShortName": "27",
+     "duration": 240,
+     "from": {
+      "name": "Pont des Arts"
+     },
+     "to": {
+      "name": "Saint-Michel Notre-Dame"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 480,
+     "from": {
+      "name": "Saint-Michel Notre-Dame"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 120,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Hôtel de Ville"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 600,
+     "from": {
+      "name": "Hôtel de Ville"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 120,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Hôtel de Ville"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 600,
+     "from": {
+      "name": "Hôtel de Ville"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  },
+  {
+   "duration": 960,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 240,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "Louvre - Rivoli"
+     }
+    },
+    {
+     "mode": "SUBWAY",
+     "displayName": "1",
+     "routeShortName": "1",
+     "duration": 120,
+     "from": {
+      "name": "Louvre - Rivoli"
+     },
+     "to": {
+      "name": "Hôtel de Ville"
+     }
+    },
+    {
+     "mode": "WALK",
+     "duration": 600,
+     "from": {
+      "name": "Hôtel de Ville"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  }
+ ],
+ "direct": [
+  {
+   "duration": 1319,
+   "transfers": 0,
+   "legs": [
+    {
+     "mode": "WALK",
+     "duration": 1319,
+     "from": {
+      "name": "START"
+     },
+     "to": {
+      "name": "END"
+     }
+    }
+   ]
+  }
+ ]
+}

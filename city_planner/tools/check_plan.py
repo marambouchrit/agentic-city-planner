@@ -59,7 +59,11 @@ def check_plan(
                 seen_ids.add(stop.place_id)
 
             start = _minutes(stop.start)
-            if previous_end is not None and start < previous_end + (stop.travel_minutes or 0):
+            if stop.hop and stop.hop.taxi_backup and (stop.hop.public_transport or stop.hop.walk):
+                add("error", "taxi_not_backup", f"A taxi is offered to '{stop.name}' although another option exists.", day.day_number)
+
+            travel = stop.hop.reserved_minutes if stop.hop else None
+            if previous_end is not None and start < previous_end + (travel or 0):
                 add("error", "time_overlap", f"'{stop.name}' starts before the traveler can arrive.", day.day_number)
             if start + stop.duration_minutes > MINUTES_PER_DAY:
                 add("error", "ends_after_midnight", f"'{stop.name}' ends after midnight.", day.day_number)
@@ -67,8 +71,9 @@ def check_plan(
 
             if (
                 max_walking_minutes is not None
-                and stop.travel_mode in ("walk", "walk_estimate")
-                and (stop.travel_minutes or 0) > max_walking_minutes
+                and stop.hop
+                and stop.hop.walk
+                and stop.hop.walk.minutes > max_walking_minutes
             ):
                 add("error", "walk_too_long", f"The walk to '{stop.name}' is over {max_walking_minutes} minutes.", day.day_number)
 
@@ -76,12 +81,12 @@ def check_plan(
                 add("warning", "meal_break", f"The {stop.slot} has no verified restaurant.", day.day_number)
             elif stop.latitude is None or stop.longitude is None:
                 add("warning", "missing_coordinates", f"'{stop.name}' has no coordinates.", day.day_number)
-            if stop.travel_mode in ("walk_estimate", "taxi_estimate"):
+            if stop.hop and (stop.hop.taxi_backup or stop.hop.check_failed or (stop.hop.walk and stop.hop.walk.is_estimate)):
                 add("warning", "estimated_travel", f"Travel to '{stop.name}' is an estimate.", day.day_number)
 
         real_stops = [stop for stop in day.stops if stop.place_id]
         for stop in real_stops[1:]:
-            if stop.travel_minutes is None or stop.travel_mode is None:
+            if stop.hop is None or stop.hop.reserved_minutes is None:
                 add("warning", "missing_travel", f"Travel time to '{stop.name}' is unknown.", day.day_number)
 
     return PlanCheck(passed=not any(issue.severity == "error" for issue in issues), issues=issues)
