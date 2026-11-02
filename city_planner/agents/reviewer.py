@@ -8,7 +8,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from city_planner.agents.base import AgentConfig, Tool
+from city_planner.agents.base import DATA_RULE, AgentConfig, Tool
 from city_planner.schemas import BudgetResult, CostItem, Place, PlanCheck, ScheduleResult, TripRequest
 from city_planner.tools.calculate_budget import calculate_budget
 from city_planner.tools.check_plan import check_plan
@@ -29,7 +29,8 @@ Your one job: check a finished plan, then approve it or send it back with specif
 - Otherwise send it back. Choose target "planner" for anything about the schedule or its cost, and "discovery" only if more or different places are needed.
 - Instructions must be specific: name the problem and what to change, using the tool results.
 - Code refuses an approval when check_plan has errors or the plan is over budget.
-- Never claim opening hours, real prices or anything else the tools did not return."""
+- Never claim opening hours, real prices or anything else the tools did not return.
+""" + DATA_RULE
 
 FINISH_DESCRIPTION = "Give your verdict on the plan, after reading the results of calculate_budget and check_plan."
 

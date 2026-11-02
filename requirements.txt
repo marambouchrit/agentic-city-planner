@@ -1,3 +1,4 @@
+fastapi==0.162.0
 httpx==0.28.1
 langgraph==1.2.19
 ortools==9.15.6755
@@ -6,3 +7,4 @@ python-dotenv==1.0.1
 pytest==8.3.4
 timezonefinder==9.2.0
 tzdata==2026.6
+uvicorn==0.54.0

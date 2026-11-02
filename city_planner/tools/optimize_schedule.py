@@ -32,6 +32,8 @@ MEAL_BREAK_TRAVEL_MINUTES = 20
 
 # Scores. One more attraction beats everything except a required place. A value of 1.0 is worth 100 minutes of travel.
 REQUIRED_BONUS = 1_000_000
+# A meal comes before any attraction, but kept stops can leave no room for one, which must not make the plan impossible.
+MISSING_MEAL_PENALTY = 100_000
 VISIT_BONUS = 10_000
 VALUE_SCALE = 1_000
 MEAL_BREAK_PENALTY = 5_000
@@ -212,6 +214,9 @@ def _solve(
             for k, other in enumerate(nodes):
                 if i == k or (node.place and other.place and node.place.place_id == other.place.place_id):
                     continue
+                # Dinner ends the day, because places are usually closed after it. A stop the traveler kept may still be there.
+                if node.slot == "dinner" and other.slot == "activity" and other.key not in problem.locked:
+                    continue
                 minutes = _arc_minutes(node, other, matrix)
                 # A move that can't arrive in time, whatever the start, is left out to keep the model small.
                 if node.earliest + node.duration + minutes > other.latest:
@@ -236,7 +241,8 @@ def _solve(
         for slot in ("lunch", "dinner"):
             meals = [visits[i] for i, n in enumerate(nodes) if n.slot == slot]
             if meals:
-                model.AddExactlyOne(meals)
+                model.AddAtMostOne(meals)
+                objective.append(MISSING_MEAL_PENALTY * sum(meals))
 
         count = sum(visits[i] for i, n in enumerate(nodes) if n.slot == "activity")
         model.Add(count <= problem.max_per_day)
@@ -344,7 +350,8 @@ def _quick_plan(problem: _Problem, matrix: dict[tuple[str, str], int]) -> list[R
             limit = min(limits) if limits else problem.day_end
 
             options = []
-            if activities < min(target, problem.max_per_day):
+            dinner_done = any(placed.slot == "dinner" for placed, _ in route)
+            if activities < min(target, problem.max_per_day) and not dinner_done:
                 for place in free_attractions:
                     node = _attraction_node(place, problem)
                     start = arrive(node)
@@ -363,7 +370,7 @@ def _quick_plan(problem: _Problem, matrix: dict[tuple[str, str], int]) -> list[R
                 candidates = [_meal_node(p, slot, window) for p in free_restaurants] or [_meal_node(None, slot, window)]
                 node = min(candidates, key=arrive)
                 start = max(arrive(node), window[0])
-                if start > window[1]:
+                if start > window[1] or (fixed and start + node.duration > fixed[0][1]):
                     continue
                 free_restaurants = [p for p in free_restaurants if node.place is None or p.place_id != node.place.place_id]
             elif fixed:
@@ -491,19 +498,26 @@ def optimize_schedule(
 
     priorities = priorities or {}
     value = {p.place_id: _value(p, priorities) for p in usable_attractions}
+    kept_lengths = {stop.place_id: stop.duration_minutes for stop in locked if stop.duration_minutes}
     ranked = sorted(usable_attractions, key=lambda p: (p.place_id not in locked_ids | required_ids, -value[p.place_id]))
     if len(ranked) > MAX_CANDIDATES:
         notes.append(f"Only the top {MAX_CANDIDATES} of {len(ranked)} attractions were considered.")
+
+    # A pace below the stops the traveler kept could never be met, so it can't apply to those days.
+    attraction_ids = {p.place_id for p in usable_attractions}
+    kept_per_day = [sum(s.day_number == n and s.place_id in attraction_ids for s in locked) for n in range(1, days + 1)]
 
     problem = _Problem(
         days=days,
         day_start=_minutes(day_start),
         day_end=_minutes(day_end),
-        max_per_day=max_activities_per_day,
+        max_per_day=max(max_activities_per_day, *kept_per_day),
         attractions=ranked[:MAX_CANDIDATES],
         restaurants=usable_restaurants[:MAX_CANDIDATES],
         visit={
-            p.place_id: max(MIN_VISIT_MINUTES, min(MAX_VISIT_MINUTES, (visit_minutes or {}).get(p.place_id, DEFAULT_VISIT_MINUTES)))
+            # A stop the traveler kept also keeps its length.
+            p.place_id: kept_lengths.get(p.place_id)
+            or max(MIN_VISIT_MINUTES, min(MAX_VISIT_MINUTES, (visit_minutes or {}).get(p.place_id, DEFAULT_VISIT_MINUTES)))
             for p in usable_attractions
         },
         value=value,
@@ -521,6 +535,16 @@ def optimize_schedule(
     }
     if start_point:
         matrix.update({("start", p.place_id): _estimate_minutes(*start_point, p.latitude, p.longitude) for p in places})
+
+    # Stops the traveler kept had real routes when they were timed, so an estimate can't call their gap impossible.
+    kept_gaps: dict[tuple[str, str], int] = {}
+    in_order = sorted(locked, key=lambda stop: (stop.day_number, _minutes(stop.start)))
+    for a, b in zip(in_order, in_order[1:]):
+        if a.day_number == b.day_number and (a.place_id, b.place_id) in matrix:
+            length = problem.visit.get(a.place_id, a.duration_minutes or MEAL_MINUTES)
+            kept_gaps[a.place_id, b.place_id] = max(0, _minutes(b.start) - _minutes(a.start) - length)
+    for pair, gap in kept_gaps.items():
+        matrix[pair] = min(matrix[pair], gap)
 
     if solver_seconds is None:
         solver_seconds = SHORT_TRIP_SECONDS if days <= SHORT_TRIP_DAYS else LONG_TRIP_SECONDS
@@ -542,6 +566,7 @@ def optimize_schedule(
             reserved = hops[pair].reserved_minutes
             if reserved is not None:
                 real = math.ceil(reserved)
+                real = min(real, kept_gaps.get(pair, real))
                 changed = changed or abs(real - matrix[pair]) > RESOLVE_TOLERANCE_MINUTES
                 matrix[pair] = real
                 # The way back is usually similar, and is a better guess than the estimate until it is checked.
@@ -581,7 +606,8 @@ def optimize_schedule(
         # A new plan can rely on hops not checked yet, so it only wins if it is better on real routes.
         if routes is None or real_rank(latest) < real_rank(routes):
             routes, proven = latest, new_proven
-        if unchanged or not any(changed):
+        # A lost stop always gets another try, because the real times are in the matrix now.
+        if unchanged or not (any(changed) or real_rank(latest)[0]):
             break
 
     if routes is None:
@@ -596,6 +622,16 @@ def optimize_schedule(
     left_out = False
     for i, route in enumerate(routes):
         stops, day_notes = _timed_day(route, i + 1, problem, hops, matrix)
+        # Without a lost stop, the stop after it has a new hop, which needs a real route too.
+        kept_stops = {(stop.place_id, stop.slot) for stop in stops}
+        kept_route = [item for item in route if (item[0].place.place_id if item[0].place else None, item[0].slot) in kept_stops]
+        if len(kept_route) < len(route):
+            fetch(i, kept_route)
+            stops, _ = _timed_day(kept_route, i + 1, problem, hops, matrix)
+        for slot in _meal_slots(problem):
+            if not any(stop.slot == slot for stop in stops):
+                left_out = True
+                notes.append(f"Day {i + 1}: there was no room for {slot}.")
         left_out = left_out or any("left out" in note for note in day_notes)
         notes.extend(f"Day {i + 1}: {note}" for note in day_notes)
         result_days.append(Day(day_number=i + 1, stops=stops))

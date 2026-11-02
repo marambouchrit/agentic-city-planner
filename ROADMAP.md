@@ -55,13 +55,13 @@ No Postgres, RAG, GraphRAG, login or extra agents. MCP is only added in Phase 7 
 | 2. Agent base and Discovery (done) | One reusable agent loop and the LangGraph skeleton | "Popular museums in Lisbon" returns only verified places |
 | 3. Planner (done) | Day-by-day schedule with transit | A 3-day trip works in Paris and Tunis |
 | 4. Reviewer (done) | Budget and constraint checks, plus the send-back loop | An over-budget plan is revised automatically |
-| 5. Orchestrator and API | Full graph, trip changes and FastAPI | One request produces a full itinerary end to end |
+| 5. Orchestrator and API (done) | Full graph, trip changes and FastAPI | One request produces a full itinerary end to end |
 | 6. Frontend | Next.js chat and itinerary view, reusing the old UI | A trip can be planned and changed in the browser |
 | 7. Finish | Evaluation on 10 cities, README with results, demo video, optional MCP | Measured results are ready for the CV |
 
 ## Known risks
 
-- Gemini's free limits can change, and models can be overloaded. The LLM stays behind one small interface so it can be swapped.
+- Gemini's free limits can change, and models can be overloaded. The LLM stays behind one small interface so it can be swapped. Gemini returned HTTP 503 in live runs, and a spike longer than about 40 seconds ends the trip, which must then be started again.
 - Wikipedia page views can be misleading. For example, Bardo National Museum showed only 85 views in one month in Phase 0, but 1,685 under its current article title, "Bardo National Museum (Tunis)", in Phase 1. Views must use the real article title.
 - Some verified places have no coordinates on Wikipedia, so `verify_place` should try Wikidata next and must not use an OpenStreetMap service such as Nominatim.
 - Transitous itself uses OpenStreetMap data, so its required credit stays. No part of this project calls OpenStreetMap directly.

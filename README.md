@@ -4,14 +4,13 @@ A multi-agent trip planner for any city, with popular places, metro stops and bu
 Four agents: Orchestrator, Discovery, Planner and Reviewer.
 
 See [ROADMAP.md](ROADMAP.md) for decisions, rules and phases, and [SPEC.md](SPEC.md) for the detailed plan.
-Phases 0 to 4 are built: the tools, the agent loop, and the Discovery, Planner and Reviewer agents. The Orchestrator comes next.
+Phases 0 to 5 are built: the tools, the agent loop, all four agents and the API. The frontend comes next.
 
 ## Plan a trip
 
 ```bash
-python -m city_planner.run Paris --days 3
-python -m city_planner.run Paris --days 3 --budget 300
-python -m city_planner.run Tunis --days 3 --date 2026-12-07 --pace 3 --preferences "history, local food"
+python -m city_planner.run "3 days in Paris with 300 euros, I love art"
+python -m city_planner.run "2 days in Paris" --then "Replace the Louvre"
 ```
 
 This uses your Gemini, Foursquare and Transitous quotas, and it prints every decision the agents made.
@@ -21,6 +20,22 @@ The Reviewer sends a plan back at most 2 times. Prices are estimates for one tra
 
 Public transport comes first. A walk of up to 20 minutes is offered as a choice, and a taxi only appears as a labelled backup
 when there is neither. Opening hours are not checked, and visit lengths are estimates.
+
+## Run the API
+
+```bash
+uvicorn city_planner.api:app --port 8000
+```
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /trips` | Start a trip from one sentence. Returns its ID |
+| `GET /trips/{id}/events` | Live progress, as server-sent events |
+| `GET /trips/{id}` | The itinerary, costs, labels and credits |
+| `POST /trips/{id}/messages` | Ask for a change. Kept stops stay at the same time |
+| `GET /health` | Status check |
+
+Trips are kept in memory, so a restart loses them. The API allows 20 planning requests a day, and only `FRONTEND_ORIGIN` can call it from a browser.
 
 ## Run the tests and checks
 

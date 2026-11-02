@@ -140,7 +140,9 @@ optimize_schedule(
 - `visit_minutes` comes from the Planner, between 30 and 240, default 90, and is labelled an estimate.
 - `start_point` is optional. Without it, each day starts at its first stop.
 - With no restaurant, the meal is a labelled meal break, a reserved time block with no location. Because it has no location, the solver can't see the real distance across it. A slow real route across a break is caught and avoided, but route order around breaks is not fully optimised.
-- Opening hours stay unchecked, because there is no data source. The plan says so.
+- Opening hours stay unchecked, because there is no data source. The plan says so. Dinner ends the day, so no attraction comes after it, unless the traveler kept one there.
+- A missing meal is a large penalty rather than an impossible rule, because kept stops can leave no room for one. The plan reports it.
+- Kept stops keep their start and length. An estimate can't make the gap between two kept stops impossible, because their times came from real routes.
 
 **Travel times:** asking Transitous about every pair is not affordable, because 15 places would mean 210 requests against a limit of 720 a day. So:
 
@@ -208,12 +210,14 @@ The solver has a time limit: 20 seconds per round for up to 3 days and 60 second
 
 ## 5. Phase 5: Orchestrator and API
 
-**Orchestrator:** an LLM agent with no tools. It turns the request into a `TripRequest`, routes the work and finishes. Code checks every route it picks against the allowed graph edges.
+**Orchestrator:** an LLM agent with no tools. It turns the request into a `TripRequest` and decides what a message means. Routing between agents is plain code along fixed graph edges, because an LLM call before every step would use up the limit of 30 for no benefit.
 
 - If something essential is missing, such as the city, it asks one question. Otherwise it uses defaults and states them.
 - Requests covering more than one city are out of scope and say so.
 
 **Trip changes:** these go through the Orchestrator. Stops the traveler kept are `locked`, removed places are `excluded`, and only what is needed runs again. For example, "replace the Louvre" should not re-verify the whole city.
+
+**After a failed change:** the plan, the request and the notes all stay as they were before that change.
 
 **State:** LangGraph's in-memory checkpointer, keyed by trip ID. No database was agreed, so trips are lost on restart, and the README says so.
 

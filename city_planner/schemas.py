@@ -135,6 +135,7 @@ class LockedStop(BaseModel):
     place_id: str
     day_number: int = Field(ge=1)
     start: str = Field(pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+    duration_minutes: int | None = Field(default=None, gt=0)
 
 
 class ScheduleResult(BaseModel):
@@ -167,3 +168,7 @@ class TripRequest(BaseModel):
     max_activities_per_day: int | None = Field(default=None, ge=1)
     max_walk_minutes: int = Field(default=20, ge=1)
     preferences: str = ""
+    # Set by code when the traveler changes a trip.
+    locked: list[LockedStop] = Field(default_factory=list)
+    excluded: list[str] = Field(default_factory=list)
+    required: list[str] = Field(default_factory=list)

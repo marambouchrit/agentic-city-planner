@@ -153,6 +153,105 @@ def test_locked_stop_keeps_its_day_and_time():
     assert lock.place_id not in {s.place_id for s in result.days[0].stops}
 
 
+def test_pace_below_the_locked_stops_does_not_break_the_plan():
+    attractions, restaurants = city(5, 2)
+    locks = [LockedStop(place_id=attractions[i].place_id, day_number=1, start=f"{9 + i * 2:02d}:00") for i in range(2)]
+    result = plan(attractions, restaurants, locked=locks, max_activities_per_day=1)
+    assert not any("simpler plan" in n for n in result.notes)
+    assert {lock.place_id for lock in locks} <= {s.place_id for s in result.days[0].stops}
+    assert len(names(result, "activity")) == 2
+
+
+def test_locked_stop_keeps_its_length_whatever_the_planner_says():
+    attractions, restaurants = city(3, 2)
+    lock = LockedStop(place_id=attractions[0].place_id, day_number=1, start="09:00", duration_minutes=75)
+    result = plan(attractions, restaurants, locked=[lock], visit_minutes={attractions[0].place_id: 200})
+    assert next(s for s in result.days[0].stops if s.place_id == lock.place_id).duration_minutes == 75
+
+
+def test_locked_stops_with_no_room_for_a_meal_still_give_a_plan_and_say_so():
+    attractions, restaurants = city(3, 2)
+    # These cover the whole lunch window, so lunch can't fit, but the rest of the plan can.
+    locks = [
+        LockedStop(place_id=attractions[0].place_id, day_number=1, start="10:30", duration_minutes=120),
+        LockedStop(place_id=attractions[1].place_id, day_number=1, start="12:45", duration_minutes=120),
+    ]
+    result = plan(attractions, restaurants, locked=locks)
+    assert not any("simpler plan" in n for n in result.notes)
+    assert any("no room for lunch" in n for n in result.notes)
+    assert result.status == "partial"
+    assert names(result, "lunch") == [] and len(names(result, "dinner")) == 1
+    assert check_plan(result.days, attractions + restaurants, 1).passed
+
+
+def test_quick_plan_never_overlaps_a_locked_stop(monkeypatch):
+    monkeypatch.setattr(module, "_solve", lambda *args: (None, False))
+    attractions, restaurants = city(3, 2)
+    locks = [
+        LockedStop(place_id=attractions[0].place_id, day_number=1, start="10:30", duration_minutes=120),
+        LockedStop(place_id=attractions[1].place_id, day_number=1, start="12:45", duration_minutes=120),
+    ]
+    result = plan(attractions, restaurants, locked=locks)
+    assert check_plan(result.days, attractions + restaurants, 1).passed
+
+
+def test_stop_lost_to_a_small_time_difference_forces_a_new_solve():
+    # Real travel is only 4 minutes over the estimate each time, under the tolerance, but enough to matter.
+    solves = []
+    original = module._solve
+
+    def counting(*args):
+        solves.append(1)
+        return original(*args)
+
+    attractions = [place(i, 48.86 + i * 0.003) for i in range(4)]
+    restaurants = [food(100 + i, 48.86 + i * 0.003) for i in range(2)]
+    visits = {p.place_id: 120 for p in attractions}
+
+    def slower(from_lat, from_lon, to_lat, to_lon, departure_local=None, max_walk_minutes=20):
+        return Hop(walk=WalkOption(minutes=module._estimate_minutes(from_lat, from_lon, to_lat, to_lon) + 4, is_estimate=False))
+
+    import pytest
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(module, "_solve", counting)
+        result = plan(attractions, restaurants, travel=slower, visit_minutes=visits, max_activities_per_day=4, solver_seconds=2)
+    assert not any("left out" in n for n in result.notes)
+    assert len(names(result, "lunch")) == 1 and len(names(result, "dinner")) == 1
+
+
+def test_gap_between_kept_stops_survives_a_higher_estimate():
+    # Real travel was 5 minutes, but the estimate for 5 km is far higher. A spare place must still fill the free day.
+    near, far, spare = place(0, 48.86), place(1, 48.905), place(2, 48.906)
+    locks = [
+        LockedStop(place_id=near.place_id, day_number=1, start="09:00", duration_minutes=60),
+        LockedStop(place_id=far.place_id, day_number=1, start="10:05", duration_minutes=60),
+    ]
+
+    def fast(from_lat, from_lon, to_lat, to_lon, departure_local=None, max_walk_minutes=20):
+        return Hop(walk=WalkOption(minutes=5, is_estimate=False))
+
+    result = plan([near, far, spare], locked=locks, travel=fast)
+    assert not any("simpler plan" in n for n in result.notes)
+    assert {s.place_id for s in result.days[0].stops} >= {near.place_id, far.place_id, spare.place_id}
+    assert check_plan(result.days, [near, far, spare], 1).passed
+
+
+def test_no_attraction_comes_after_dinner():
+    # Far from dinner, so going after it would save a trip. It must still come first.
+    attractions = [place(0, 48.86), place(1, 48.861), place(2, 48.90)]
+    result = plan(attractions, [food(100, 48.86), food(101, 48.861)], max_activities_per_day=3)
+    slots = [s.slot for s in result.days[0].stops]
+    assert slots[-1] == "dinner" and slots.count("activity") == 3
+
+
+def test_kept_stop_may_stay_after_dinner():
+    attractions, restaurants = city(2, 2)
+    lock = LockedStop(place_id=attractions[0].place_id, day_number=1, start="20:30", duration_minutes=60)
+    stops = plan(attractions, restaurants, locked=[lock]).days[0].stops
+    assert stops[-1].place_id == lock.place_id
+
+
 def test_locked_restaurant_keeps_its_meal():
     attractions, restaurants = city(3, 3)
     lock = LockedStop(place_id=restaurants[2].place_id, day_number=1, start="13:30")

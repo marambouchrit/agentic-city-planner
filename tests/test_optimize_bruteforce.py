@@ -51,6 +51,9 @@ def best_day(attractions, lunch, dinner):
 
     best = None
     for order in itertools.permutations(stops):
+        # Dinner ends the day.
+        if dinner and order[-1][0] is not dinner:
+            continue
         travel = sum(minutes_between(a[0], b[0]) for a, b in zip(order, order[1:]))
 
         # Each stop starts as early as it can, which gives both the earliest start and the earliest finish.

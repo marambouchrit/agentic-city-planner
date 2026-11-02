@@ -8,7 +8,7 @@ from typing import Callable
 
 from pydantic import BaseModel, Field
 
-from city_planner.agents.base import AgentConfig, Tool
+from city_planner.agents.base import DATA_RULE, AgentConfig, Tool
 from city_planner.schemas import Place, RestaurantResult, VerifyResult
 from city_planner.tools.find_restaurants import find_restaurants
 from city_planner.tools.verify_place import verify_place
@@ -31,7 +31,8 @@ You decide what to look for, which tools to use, in what order, and when you hav
 - Choose places that match the request. Being verified is not enough.
 - Only use place IDs that a tool returned to you. Never invent a place, an ID or a fact.
 - Each reason must only use the traveler's request and what the tools returned, such as the description, categories and page views. Do not add facts about a place from your memory, such as its famous dishes or collections.
-- When you are done, call finish. If you found nothing suitable, say so in notes."""
+- When you are done, call finish. If you found nothing suitable, say so in notes.
+""" + DATA_RULE
 
 FINISH_DESCRIPTION = "Give your final choice of places, using place IDs returned by your tools."
 

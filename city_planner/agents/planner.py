@@ -7,7 +7,7 @@ from typing import Callable
 
 from pydantic import BaseModel, Field
 
-from city_planner.agents.base import AgentConfig, Tool
+from city_planner.agents.base import DATA_RULE, AgentConfig, Tool
 from city_planner.agents.discovery import DiscoveryOutput
 from city_planner.schemas import Hop, Place, ScheduleResult, TripRequest
 from city_planner.tools.get_route import get_route
@@ -29,7 +29,8 @@ You decide the traveler's priorities, the pace, how long each visit needs, and w
 - If the Reviewer sent a plan back, make the change it asks for. To cut costs, use excluded to leave out the most expensive places it lists. A meal break still means buying a meal, so only leave out a restaurant that costs clearly more than an ordinary meal. Keep free places. Cut only as much as the amount over budget needs.
 - Only use place IDs from the list you are given. Never invent a place, a time or a route.
 - When you are done, call finish with the schedule_id you choose and a short explanation of your choices.
-- The explanation must only use the traveler's request and the tool results. Do not add facts from your memory, such as opening hours or prices."""
+- The explanation must only use the traveler's request and the tool results. Do not add facts from your memory, such as opening hours or prices.
+""" + DATA_RULE
 
 FINISH_DESCRIPTION = "Choose the final schedule by its schedule_id, and explain your choices."
 
@@ -114,6 +115,8 @@ def planner_task(trip: TripRequest, discovery: DiscoveryOutput, feedback: str = 
         "Restaurants:",
         *(map(line, discovery.restaurants) if discovery.restaurants else ["(none found)"]),
     ]
+    if trip.locked:
+        parts.append("The traveler kept some stops, and code keeps them fixed. Leave them in. Only the free time around them can change.")
     if trip.max_activities_per_day:
         parts.insert(2, f"The traveler asked for at most {trip.max_activities_per_day} attractions a day.")
     if feedback:
@@ -132,6 +135,7 @@ def build_planner_agent(
     schedules: dict[str, ScheduleResult] = {}
     choices: dict[str, str] = {}
     route_calls = {"count": 0}
+    kept_ids = {stop.place_id for stop in trip.locked}
 
     def check_ids(place_ids: list[str]) -> None:
         unknown = [place_id for place_id in place_ids if place_id not in places]
@@ -150,8 +154,10 @@ def build_planner_agent(
             max_activities_per_day=trip.max_activities_per_day or args.max_activities_per_day,
             visit_minutes={v.place_id: v.minutes for v in args.visit_minutes},
             priorities={p.place_id: p.value for p in args.priorities},
-            excluded=args.excluded,
-            required=args.required,
+            # The traveler's own changes always apply, and a stop they kept can't be left out.
+            excluded=sorted((set(args.excluded) - kept_ids) | set(trip.excluded)),
+            required=sorted(set(args.required) | set(trip.required)),
+            locked=trip.locked,
             start_date=trip.start_date,
             max_walk_minutes=trip.max_walk_minutes,
         )

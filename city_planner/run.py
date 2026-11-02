@@ -1,55 +1,32 @@
-"""Plan a trip and show every decision the agents made. The Orchestrator replaces these options in Phase 5.
+"""Plan a trip from one sentence and show every decision the agents made.
 
-    python -m city_planner.run Paris --days 3
-    python -m city_planner.run Tunis --days 3 --date 2026-12-07 --pace 3 --preferences "history, local food"
+    python -m city_planner.run "3 days in Paris, 300 euros, I love art"
+    python -m city_planner.run "2 days in Paris" --then "Replace the Louvre"
 """
 
 import argparse
 import json
-from datetime import date
+import uuid
 
 from city_planner.agents.planner import _travel_summary
-from city_planner.graph import plan_trip
+from city_planner.graph import handle_message, new_checkpointer
 from city_planner.llm import GeminiLLM, LLMError
-from city_planner.schemas import TripRequest
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Plan a city trip.")
-    parser.add_argument("city")
-    parser.add_argument("--days", type=int, default=3)
-    parser.add_argument("--date", type=date.fromisoformat, help="First day of the trip, as 2026-12-07")
-    parser.add_argument("--pace", type=int, help="At most this many attractions a day")
-    parser.add_argument("--budget", type=float, help="For one traveler")
-    parser.add_argument("--currency", default="EUR")
-    parser.add_argument("--preferences", default="")
-    args = parser.parse_args()
-    trip = TripRequest(
-        city=args.city,
-        days=args.days,
-        start_date=args.date,
-        max_activities_per_day=args.pace,
-        budget=args.budget,
-        currency=args.currency,
-        preferences=args.preferences,
-    )
-    try:
-        state = plan_trip(trip, GeminiLLM())
-    except LLMError as exc:
-        raise SystemExit(str(exc)) from None
-
+def show(state: dict) -> None:
     print("Decisions:")
-    for event in state["trace"]:
+    for event in state.get("trace", []):
         print(f"  [{event.agent} step {event.step}] {event.kind}: {event.tool or ''} {json.dumps(event.args, ensure_ascii=False)}")
         if event.result:
             print(f"      -> {event.result}")
 
-    print(f"\nLLM calls: {state['llm_calls']}")
+    print(f"\nLLM calls this request: {state.get('llm_calls')}")
+    if state.get("reply"):
+        print(f"Reply: {state['reply']}")
     if state.get("error"):
         print(f"Stopped: {state['error']}")
     discovery = state.get("discovery")
     if discovery is None:
-        print("No result.")
         return
 
     print(f"\nCity: {discovery.city}")
@@ -63,7 +40,7 @@ def main() -> None:
     print(f"Rejected by tools: {discovery.rejected}")
     print(f"Could not be checked: {discovery.unavailable}")
 
-    planner = state.get("final_plan") or state.get("planner")
+    planner = state.get("final_plan") or state.get("planner") or state.get("previous_plan")
     if planner is None:
         print("\nNo schedule was produced.")
         return
@@ -80,7 +57,7 @@ def main() -> None:
         print(f"Note: {note}")
     print(f"\nAgent's opinion, not verified data: {planner.explanation}")
 
-    review = state.get("final_review")
+    review = state.get("final_review") or state.get("previous_review")
     print(f"\nRevisions: {state.get('send_backs', 0)}")
     if review is None:
         print("This plan was not reviewed.")
@@ -97,6 +74,22 @@ def main() -> None:
         if issue.severity == "error":
             print(f"Rule error: {issue.message}")
     print(f"Agent's opinion, not verified data: {review.summary}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Plan a city trip from one sentence.")
+    parser.add_argument("message")
+    parser.add_argument("--then", help="A change to ask for after the first plan")
+    args = parser.parse_args()
+    trip_id = uuid.uuid4().hex
+    checkpointer = new_checkpointer()
+    try:
+        llm = GeminiLLM()
+        for message in filter(None, (args.message, args.then)):
+            print(f"\n===== {message}")
+            show(handle_message(trip_id, message, llm, checkpointer))
+    except LLMError as exc:
+        raise SystemExit(str(exc)) from None
 
 
 if __name__ == "__main__":
