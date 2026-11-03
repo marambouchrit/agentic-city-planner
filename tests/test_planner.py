@@ -74,6 +74,16 @@ def test_final_schedule_is_exactly_what_the_tool_produced():
     assert check_plan(result.output.schedule.days, ATTRACTIONS + RESTAURANTS, 1).passed
 
 
+def test_explanation_naming_a_place_not_in_the_plan_is_left_out():
+    result, _ = run([[optimize_call(pace=1, excluded=["wikipedia:0", "wikipedia:2", "wikipedia:3"])], [call("finish", schedule_id="schedule_1", explanation="Starts at Museum 0.")]])
+    assert "left out" in result.output.explanation
+
+
+def test_explanation_naming_planned_places_is_kept():
+    result, _ = run([[optimize_call(pace=1, excluded=["wikipedia:0", "wikipedia:2", "wikipedia:3"])], [call("finish", schedule_id="schedule_1", explanation="Starts at Museum 1.")]])
+    assert result.output.explanation == "Starts at Museum 1."
+
+
 def test_invented_schedule_id_is_rejected():
     result, llm = run([[optimize_call()], [finish("schedule_99")], [finish()]])
     assert result.trace[1].kind == "rejected"

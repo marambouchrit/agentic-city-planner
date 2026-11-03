@@ -29,6 +29,7 @@ function rideDetail(line: TransitLine): string {
 /**
  * The traveler's transport rules, in words. Public transport comes first, a nearby walk is
  * a choice, and a taxi is only mentioned as a labelled backup when neither exists.
+ * A hop's note, such as which date was checked, is shown once with the itinerary's notes.
  */
 export function describeHop(hop: Hop): string[] {
   const lines: string[] = [];
@@ -49,6 +50,5 @@ export function describeHop(hop: Hop): string[] {
     lines.push("Travel time unknown.");
   }
 
-  if (hop.note) lines.push(hop.note);
   return lines;
 }

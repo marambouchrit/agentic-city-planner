@@ -272,7 +272,7 @@ A trip can take minutes, at about 9 seconds per LLM call, so a single blocking r
 
 Budget totals are not reported as accurate, because the prices are estimates.
 
-**Deliverables:** README with measured results and known limits, demo video, and MCP only if time allows.
+**Deliverables:** README with measured results and known limits, and a demo video. MCP was dropped by the owner on 2026-11-03.
 
 **Before publishing:** ask the Transitous team whether agent requests count as automated use, confirm the attribution, and check that the repo holds no keys or the private journal.
 

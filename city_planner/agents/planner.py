@@ -102,6 +102,16 @@ def _summary(schedule_id: str, schedule: ScheduleResult) -> dict:
     }
 
 
+def _checked_explanation(explanation: str, schedule: ScheduleResult, places: dict[str, Place]) -> str:
+    """An explanation that names a known place missing from the plan would mislead, so it is left out."""
+    planned = {stop.place_id for day in schedule.days for stop in day.stops}
+    text = explanation.casefold()
+    missing = [p.name for p in places.values() if p.place_id not in planned and p.name.casefold() in text]
+    if missing:
+        return "The explanation was left out, because it named places that aren't in this plan."
+    return explanation
+
+
 def planner_task(trip: TripRequest, discovery: DiscoveryOutput, feedback: str = "") -> str:
     def line(chosen) -> str:
         views = f", {chosen.place.page_views} page views" if chosen.place.page_views is not None else ""
@@ -181,7 +191,12 @@ def build_planner_agent(
             raise ValueError(f"{answer.schedule_id} was not returned by optimize_schedule.")
         if schedule.status == "failed":
             raise ValueError(f"{answer.schedule_id} failed, so it can't be the final schedule.")
-        return PlannerOutput(schedule=schedule, explanation=answer.explanation, schedule_id=answer.schedule_id, choices=choices[answer.schedule_id])
+        return PlannerOutput(
+            schedule=schedule,
+            explanation=_checked_explanation(answer.explanation, schedule, places),
+            schedule_id=answer.schedule_id,
+            choices=choices[answer.schedule_id],
+        )
 
     return AgentConfig(
         name="Planner",

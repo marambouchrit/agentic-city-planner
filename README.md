@@ -56,6 +56,14 @@ npx playwright install chromium
 npm test
 ```
 
+One more test uses the real services and quotas, about 70 Transitous requests and 20 to 40 Gemini calls.
+It builds the website, starts the API, plans a 3-day Paris trip in a browser and changes it:
+
+```bash
+cd frontend
+npx playwright test --config e2e-live/live.config.ts
+```
+
 ## Run the tests and checks
 
 ```bash

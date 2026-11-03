@@ -51,9 +51,9 @@ test("transfers name each line, and modes get plain names", () => {
   expect(describeHop({ ...NONE, public_transport: { ...BUS, minutes: 23, lines } })[0]).toBe("Metro 7, then Train C, 23 min.");
 });
 
-test("unknown travel says so, and a date note is shown", () => {
+test("unknown travel says so, and a hop's note is left for the notes section", () => {
   expect(describeHop(NONE)).toEqual(["Travel time unknown."]);
-  expect(describeHop({ ...NONE, walk: WALK, note: "A normal weekday was checked." })).toContain("A normal weekday was checked.");
+  expect(describeHop({ ...NONE, walk: WALK, note: "A normal weekday was checked." })).toEqual(["Walk, 13 min."]);
 });
 
 const BUDGET: Budget = { total: 90, currency: "EUR", budget: 100, over_budget: false, difference: 10, missing_costs: [], includes_estimates: true, note: "" };

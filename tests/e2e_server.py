@@ -73,7 +73,8 @@ def fake_route(from_lat, from_lon, to_lat, to_lon, departure_local=None, max_wal
         taxi = None if walk else TaxiBackup(minutes=round(km * 2.4, 1), reason="No public transport route in our data, and it is too far to walk. Taxi time is an estimate.")
         return Hop(walk=walk, taxi_backup=taxi, distance_km=round(km, 2))
     line = TransitLine(mode="SUBWAY", line="1", from_stop="Louvre - Rivoli", to_stop="Chatelet")
-    return Hop(public_transport=PublicTransportOption(minutes=round(8 + km * 3, 1), transfers=0, lines=[line]), walk=walk, distance_km=round(km, 2))
+    note = "No date was given, so a normal weekday was checked."
+    return Hop(public_transport=PublicTransportOption(minutes=round(8 + km * 3, 1), transfers=0, lines=[line]), walk=walk, distance_km=round(km, 2), note=note)
 
 
 def _call(tool_name, /, **args):

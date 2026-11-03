@@ -45,6 +45,7 @@ test("one sentence gives a checked trip, with real progress on the way", async (
   await expect(page.getByText("Powered by Foursquare").first()).toBeVisible();
   await expect(page.getByText("Restaurants are powered by Foursquare.")).toBeVisible();
   await expect(page.getByText("Transitous", { exact: false }).first()).toBeVisible();
+  await expect(page.getByText("No date was given, so a normal weekday was checked.")).toHaveCount(1);
 });
 
 test("public transport comes first, a near walk is a choice, and no taxi is mentioned", async ({ page }) => {

@@ -56,7 +56,9 @@ export default function Itinerary({ trip, refreshing }: { trip: TripView; refres
 
 function Notes({ trip }: { trip: TripView }) {
   // The labels below already say this, so it isn't repeated in the notes.
-  const notes = [...trip.notes, ...trip.schedule!.notes].filter((note) => !trip.labels.includes(note));
+  // Travel notes, such as which date was checked, are usually the same for every hop, so each is shown once.
+  const travelNotes = trip.schedule!.days.flatMap((day) => day.stops.map((stop) => stop.hop?.note ?? "")).filter(Boolean);
+  const notes = [...new Set([...trip.notes, ...trip.schedule!.notes, ...travelNotes])].filter((note) => !trip.labels.includes(note));
   return (
     <div className="space-y-3 rounded-xl border border-clay/30 bg-clay/5 p-4 text-sm text-ink/90">
       {notes.length > 0 && (
