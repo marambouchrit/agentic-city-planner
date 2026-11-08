@@ -283,7 +283,7 @@ Budget totals are not reported as accurate, because the prices are estimates.
 
 **Deliverables:** README with measured results and known limits. The owner dropped the demo video and MCP on 2026-11-03.
 
-**Before publishing:** ask the Transitous team whether agent requests count as automated use, confirm the attribution, and check that the repo holds no keys or the private journal.
+**Before publishing:** confirm the attribution, and check that the repo holds no keys or the private journal. Contacting Transitous is not needed: its policy asks for coordination only above 720 `/plan` requests a day, and we stop at 700 (checked 2026-11-08).
 
 ## 8. Rules for every phase
 

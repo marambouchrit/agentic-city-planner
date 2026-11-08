@@ -65,7 +65,7 @@ No Postgres, RAG, GraphRAG, login, MCP or extra agents. The project owner droppe
 - Wikipedia page views can be misleading. For example, Bardo National Museum showed only 85 views in one month in Phase 0, but 1,685 under its current article title, "Bardo National Museum (Tunis)", in Phase 1. Views must use the real article title.
 - Some verified places have no coordinates on Wikipedia, so `verify_place` should try Wikidata next and must not use an OpenStreetMap service such as Nominatim.
 - Transitous itself uses OpenStreetMap data, so its required credit stays. No part of this project calls OpenStreetMap directly.
-- Ask the Transitous team whether agent requests count as automated use before publishing.
+- Transitous asks for coordination only above 720 `/plan` requests a day, and asks not to be contacted otherwise (checked 2026-11-08). We stop at 700, send a User-Agent with a contact, are open source under MIT, and are not commercial. Commercial use is not allowed.
 - A 3-day trip revised twice for its budget used 15 to 19 LLM calls and 47 to 77 Transitous requests in 4 live Paris runs, so only about 9 to 14 such trips fit the daily limit. A plan needing no revision used 17 to 28 requests before the Reviewer existed. Gemini's daily limit for a full trip is still unmeasured.
 - A verified name can match a related article, such as "Luxembourg Garden" matching Luxembourg Palace.
 - Code can check that a place is real, but not every word of an agent's reason. Reasons are labelled as opinion.
