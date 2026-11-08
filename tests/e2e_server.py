@@ -137,6 +137,10 @@ class ScriptedLLM:
             needed = re.findall(r"needs a price per .*?item_id: (\S+)", task)
             return [_call("calculate_budget", prices=[{"item_id": item, "amount": 10} for item in needed]), _call("check_plan")]
         budget = next(result for name, result in messages[-1]["results"] if name == "calculate_budget")
+        if "error" in budget:
+            # A price above the whole budget gets a currency warning. These prices are right, so they are sent again.
+            needed = re.findall(r"needs a price per .*?item_id: (\S+)", task)
+            return [_call("calculate_budget", prices=[{"item_id": item, "amount": 10} for item in needed])]
         if budget["over_budget"]:
             return [_call("finish", verdict="send_back", issue_code="over_budget", instructions="The plan is over budget.", summary="Over budget.")]
         return [_call("finish", verdict="approve", summary="Fine.")]

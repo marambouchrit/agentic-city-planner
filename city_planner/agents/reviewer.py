@@ -17,6 +17,9 @@ MAX_STEPS = 4  # 3 left no room to correct a refused approval in a live run
 
 PUBLIC_TRANSPORT_FARE = "public_transport_fare"
 BACKUP_PRICE_PER_KM = "taxi_per_km"
+# A price is fixed for the whole trip once set, so one above the whole budget gets a currency warning first.
+# The same price sent again after the warning is accepted, because a small budget can be real.
+MAX_SHARE_OF_BUDGET = 1.0
 MEAL_BREAK_PRICE = "meal_break"  # one price, because every meal break is the same unnamed meal
 
 INSTRUCTIONS = """You are the Reviewer agent of a city trip planner.
@@ -116,7 +119,14 @@ def reviewer_task(trip: TripRequest, schedule: ScheduleResult, known_prices: dic
     ]
     budget = f"{trip.budget} {trip.currency} for one traveler" if trip.budget is not None else f"none given (use {trip.currency})"
     return "\n".join(
-        [f"Review this {trip.days}-day plan for {trip.city}.", f"Budget: {budget}.", "Plan:", *plan, "Items:", *map(line, price_lines(schedule))]
+        [
+            f"Review this {trip.days}-day plan for {trip.city}.",
+            f"Budget: {budget}. Give every price in {trip.currency}, even if the city uses another currency.",
+            "Plan:",
+            *plan,
+            "Items:",
+            *map(line, price_lines(schedule)),
+        ]
     )
 
 
@@ -125,11 +135,26 @@ def build_reviewer_agent(trip: TripRequest, schedule: ScheduleResult, known_plac
     lines = price_lines(schedule)
     line_ids = {line.item_id for line in lines}
     state: dict = {"budget": None, "costs": [], "prices": dict(known_prices)}
+    warned: dict[str, float] = {}
 
     def run_budget(args: BudgetArgs) -> dict:
         unknown = [price.item_id for price in args.prices if price.item_id not in line_ids]
         if unknown:
             raise ValueError(f"These items are not in the plan: {unknown}. Valid item IDs: {sorted(line_ids)}")
+        if trip.budget:
+            too_high = [
+                price.item_id
+                for price in args.prices
+                if price.item_id != BACKUP_PRICE_PER_KM
+                and price.amount > trip.budget * MAX_SHARE_OF_BUDGET
+                and warned.get(price.item_id) != price.amount
+            ]
+            if too_high:
+                warned.update({price.item_id: price.amount for price in args.prices if price.item_id in too_high})
+                raise ValueError(
+                    f"These prices are more than the whole budget, which suggests another currency: {too_high}. "
+                    f"Give every price in {trip.currency}, for one traveler. If a price really is that high, send it again unchanged."
+                )
         prices = dict(known_prices)
         for price in args.prices:
             prices.setdefault(price.item_id, price.amount)

@@ -258,7 +258,14 @@ A trip can take minutes, at about 9 seconds per LLM call, so a single blocking r
 
 ## 7. Phase 7: Finish
 
-**Evaluation:** 10 cities, chosen in advance, including large metros, thin-data cities and small towns such as Paris, Tunis and Luang Prabang. The set and metrics are fixed before running, and results are reported even when poor.
+**Evaluation:** 10 big cities, chosen by the owner on 2026-11-03: Paris, London, Berlin, Madrid, Rome, Amsterdam, Vienna, Barcelona, New York and Tokyo. Thin-data cities and small towns are left out, so the results describe big cities only. The set, the request and the metrics are fixed before running, and results are reported even when poor.
+
+Protocol, fixed before any result:
+
+- One run per city, run by `evaluation/run_eval.py` in process, with the same request: "3 days in {city} with 400 euros, I love art and history".
+- Then one change: "I don't want the {name}, replace it with something else", where {name} is the most viewed attraction in the plan, chosen by code.
+- A run that fails because of a Gemini outage (HTTP 429 or 503) or a lost connection gets one retry, and the retry is reported. Any other failure is never retried and counts as a failure.
+- A city starts only if at least 80 Transitous requests are left that day, so a run is never cut short by the limit. The rest wait for the next day.
 
 | Metric | How it is measured |
 |---|---|
@@ -269,10 +276,12 @@ A trip can take minutes, at about 9 seconds per LLM call, so a single blocking r
 | Accuracy of the solver's estimate | Estimated minutes compared with real minutes |
 | Cost per trip | LLM calls, Transitous requests, Foursquare calls, time taken |
 | Reviewer value | How often it finds a real problem, and how often revision fixes it |
+| Changes | Whether the removed place is gone, every other stop kept its day and time, and the gap was filled |
+| Day rules | Visits after dinner, and meals missing |
 
 Budget totals are not reported as accurate, because the prices are estimates.
 
-**Deliverables:** README with measured results and known limits, and a demo video. MCP was dropped by the owner on 2026-11-03.
+**Deliverables:** README with measured results and known limits. The owner dropped the demo video and MCP on 2026-11-03.
 
 **Before publishing:** ask the Transitous team whether agent requests count as automated use, confirm the attribution, and check that the repo holds no keys or the private journal.
 

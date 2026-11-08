@@ -57,7 +57,7 @@ No Postgres, RAG, GraphRAG, login, MCP or extra agents. The project owner droppe
 | 4. Reviewer (done) | Budget and constraint checks, plus the send-back loop | An over-budget plan is revised automatically |
 | 5. Orchestrator and API (done) | Full graph, trip changes and FastAPI | One request produces a full itinerary end to end |
 | 6. Frontend (done) | Next.js chat and itinerary view, with the old UI used only as a starting point after reading it | A trip can be planned and changed in the browser |
-| 7. Finish | Evaluation on 10 cities, README with results, demo video | Measured results are ready for the CV |
+| 7. Finish (done) | Evaluation on 10 big cities, README with results | Measured results are ready for the CV |
 
 ## Known risks
 

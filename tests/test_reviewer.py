@@ -143,6 +143,24 @@ def test_known_price_cannot_be_lowered_in_a_later_round():
     assert run.output.budget.over_budget is True
 
 
+def test_price_in_another_currency_is_refused_before_it_is_fixed():
+    yen = [{"item_id": "entry:wikipedia:1", "amount": 2000}, *CHEAP[1:]]
+    run, llm = review([[budget_call(yen)], [budget_call()], [verdict()]])
+    assert "another currency" in result(llm, 1)["error"]
+    assert run.output.prices["entry:wikipedia:1"] == 10
+
+
+def test_high_price_sent_again_after_the_warning_is_accepted():
+    pricey = [{"item_id": "entry:wikipedia:1", "amount": 150}, *CHEAP[1:]]
+    run, llm = review([[budget_call(pricey)], [budget_call(pricey)], [verdict("send_back", instructions="Too much.")]])
+    assert "another currency" in result(llm, 1)["error"]
+    assert run.output.prices["entry:wikipedia:1"] == 150 and run.output.budget.over_budget is True
+
+
+def test_task_asks_for_the_trip_currency():
+    assert "Give every price in EUR" in reviewer_task(TRIP, SCHEDULE, {})
+
+
 def test_negative_price_is_refused():
     _, llm = review([[budget_call([{"item_id": "entry:wikipedia:1", "amount": -5}])], [budget_call()], [verdict()]])
     assert "Invalid arguments" in result(llm, 1)["error"]
@@ -241,12 +259,12 @@ def test_send_backs_stop_at_two_and_problems_are_reported_not_hidden(monkeypatch
 def test_a_worse_revision_does_not_replace_the_best_plan(monkeypatch):
     graph_setup(monkeypatch)
     # The revision has fewer places but still costs more, because its new meal is priced much higher.
-    worse = [{"item_id": "entry:wikipedia:2", "amount": 10}, {"item_id": "meal:foursquare:3", "amount": 20}, {"item_id": "meal:foursquare:4", "amount": 500}]
+    worse = [{"item_id": "entry:wikipedia:2", "amount": 10}, {"item_id": "meal:foursquare:3", "amount": 20}, {"item_id": "meal:foursquare:4", "amount": 99}]
     first = planner_turn() + reviewer_turn("send_back", prices=[*ALL_PRICES[:2], {"item_id": "meal:foursquare:3", "amount": 20}])
     revision = planner_turn(excluded=["wikipedia:1"]) + reviewer_turn("send_back", prices=worse)
     state = plan_trip(TRIP_100, FakeLLM(DISCOVER + first + revision + planner_turn() + reviewer_turn("send_back", prices=worse)))
     assert state["send_backs"] == 2
-    assert state["review"].budget.total > 500
+    assert state["review"].budget.total > 110
     assert state["final_review"].budget.total == 110
     assert "Museum" in [s.name for d in state["final_plan"].schedule.days for s in d.stops]
 
